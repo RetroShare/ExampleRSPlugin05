@@ -23,8 +23,12 @@ public:
     p3ExampleRS(RsPluginHandler *pgHandler, RsPeers* peers);
 
     virtual int tick();
+	virtual bool  recvItem(RsItem *item);
     virtual void statusChange(const std::list<pqipeer> &plist);
 
+
+	virtual RsServiceInfo getServiceInfo() ;
+	void on_timer();
 
 private:
     void handleMessage( RsExampleItem *item );
@@ -32,6 +36,7 @@ private:
 
 private:
 
+	RsMutex mExampleMtx;
     RsPeers * m_peers;
 };
 

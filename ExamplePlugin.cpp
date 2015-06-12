@@ -6,7 +6,8 @@
 
 
 #include <retroshare/rsplugin.h>
-#include <util/rsversion.h>
+#include <util/rsversioninfo.h>
+#include <retroshare/rsversion.h>
 #include <QTranslator>
 #include <QMessageBox>
 
@@ -23,7 +24,7 @@ extern "C" {
 	// It will be tested by RS to load the plugin automatically, since it is safe to load plugins
 	// with same revision numbers, assuming that the revision numbers are up-to-date.
 	//
-	uint32_t RETROSHARE_PLUGIN_revision = SVN_REVISION_NUMBER ;
+	uint32_t RETROSHARE_PLUGIN_revision = RS_REVISION_NUMBER ;
 
 	// This symbol contains the svn revision number grabbed from the executable. 
 	// It will be tested by RS to load the plugin automatically, since it is safe to load plugins
@@ -34,11 +35,12 @@ extern "C" {
 
 #define IMAGE_LINKS ":/images/bitcoin.png"
 
-void ExamplePlugin::getPluginVersion(int& major,int& minor,int& svn_rev) const
+void ExamplePlugin::getPluginVersion(int& major, int& minor, int &build, int& svn_rev) const
 {
-    major = 5 ;
-    minor = 4 ;
-    svn_rev = SVN_REVISION_NUMBER ;
+	major = RS_MAJOR_VERSION;
+	minor = RS_MINOR_VERSION;
+	build = RS_BUILD_NUMBER;
+	svn_rev = RS_REVISION_NUMBER;
 }
 
 ExamplePlugin::ExamplePlugin()
@@ -59,7 +61,8 @@ void ExamplePlugin::setInterfaces(RsPlugInInterfaces &interfaces)
 MainPage *ExamplePlugin::qt_page() const
 {
     if(mainpage == NULL){
-        mainpage = new ExampleDialog( );
+		tpage = new ExampleDialog( );
+		mainpage = tpage;
     }
 
     return mainpage ;
@@ -87,6 +90,7 @@ RsPQIService * ExamplePlugin::rs_pqi_service() const
 {
     if(m_Example == NULL){
         m_Example = new p3ExampleRS(mPlugInHandler, m_peers ) ;
+		tpage->p3service = m_Example;
     }
 
     return m_Example ;

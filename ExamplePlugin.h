@@ -3,6 +3,7 @@
 
 #include <retroshare/rsplugin.h>
 #include <retroshare-gui/mainpage.h>
+#include "ExampleDialog.h"
 
 class p3ExampleRS;
 
@@ -18,7 +19,7 @@ public:
     virtual QDialog * qt_about_page() const;
     virtual void stop() const;
 
-    virtual void getPluginVersion(int& major,int& minor,int& svn_rev) const ;
+	virtual void getPluginVersion(int& major, int& minor, int &build, int& svn_rev) const ;
     virtual void setPlugInHandler(RsPluginHandler *pgHandler);
 
     virtual std::string configurationFileName() const { return "example.cfg" ; }
@@ -28,8 +29,9 @@ public:
     virtual RsPQIService * rs_pqi_service() const;
     virtual void setInterfaces(RsPlugInInterfaces& interfaces);
 private:
-    mutable RsPluginHandler *mPlugInHandler;
-    mutable MainPage* mainpage ;
+	mutable RsPluginHandler *mPlugInHandler;
+	mutable ExampleDialog* tpage ;
+	mutable MainPage* mainpage ;
     mutable QIcon* mIcon ;
     mutable RsPeers* m_peers;
     mutable p3ExampleRS * m_Example;

@@ -25,18 +25,18 @@
 static const int INIT_THRESHOLD = 3;
 
 p3ExampleRS::p3ExampleRS(RsPluginHandler *pgHandler, RsPeers* peers ) :
-        RsPQIService( RS_SERVICE_TYPE_EXAMPLE_PLUGIN, CONFIG_TYPE_EXAMPLE_PLUGIN, 0, pgHandler ),
-
-        m_peers(peers)
+		RsPQIService( RS_SERVICE_TYPE_EXAMPLE_PLUGIN, CONFIG_TYPE_EXAMPLE_PLUGIN, pgHandler )
+		, mExampleMtx("p3Example")
+		,m_peers(peers)
 {
     addSerialType(new RsExampleSerialiser());
-    pgHandler->getLinkMgr()->addMonitor( this );
+	mLinkMgr->addMonitor( this );
 }
 
 
 void p3ExampleRS::statusChange(const std::list< pqipeer > &plist)
 {
-    std::cerr << "Example: Status changed:" << std::endl;
+	/*std::cerr << "Example: Status changed:" << std::endl;
 
     for (std::list< pqipeer >::const_iterator peerIt = plist.begin(); peerIt != plist.end(); peerIt++ ){
         if( RS_PEER_CONNECTED & (*peerIt).actions ){
@@ -44,13 +44,29 @@ void p3ExampleRS::statusChange(const std::list< pqipeer > &plist)
             item->PeerId( (*peerIt).id );
             sendItem( item );
         }
-    }
+	}*/
+}
+
+RsServiceInfo p3ExampleRS::getServiceInfo()
+{
+	const std::string TURTLE_APP_NAME = "Example";
+	const uint16_t TURTLE_APP_MAJOR_VERSION  =       1;
+	const uint16_t TURTLE_APP_MINOR_VERSION  =       0;
+	const uint16_t TURTLE_MIN_MAJOR_VERSION  =       1;
+	const uint16_t TURTLE_MIN_MINOR_VERSION  =       0;
+
+	return RsServiceInfo(RS_SERVICE_TYPE_EXAMPLE_PLUGIN,
+						 TURTLE_APP_NAME,
+						 TURTLE_APP_MAJOR_VERSION,
+						 TURTLE_APP_MINOR_VERSION,
+						 TURTLE_MIN_MAJOR_VERSION,
+						 TURTLE_MIN_MINOR_VERSION);
 }
 
 
 int p3ExampleRS::tick()
 {
-    RsItem *item = NULL;
+	/*RsItem *item = NULL;
     while(NULL != (item = recvItem())){
         switch( item->PacketSubType() )
         {
@@ -61,13 +77,51 @@ int p3ExampleRS::tick()
             std::cerr << "Example: Received Item unknown" << std::endl;
         }
         delete item;
-    }
+	}*/
     return 0;
+}
+bool	p3ExampleRS::recvItem(RsItem *item)
+{
+	/* pass to specific handler */
+	bool keep = false ;
+
+	switch(item->PacketSubType())
+	{
+
+		case RsExampleItem::EXAMPLE_ITEM:
+			std::cout << "Example: Received Item Example Item" << std::endl;
+			handleExampleItem( dynamic_cast<RsExampleItem*>( item ) );
+			break;
+		default:
+		std::cout << "Example: Received Item unknown" << std::endl;
+			break;
+	}
+
+	/* clean up */
+	if(!keep)
+		delete item;
+	return true ;
+}
+
+void p3ExampleRS::on_timer(){
+	std::cout << "Timer: sending init messages to all contacts!!" << std::endl;
+
+	std::list< RsPeerId > plist;
+
+	RsStackMutex stack(mExampleMtx); /****** LOCKED MUTEX *******/
+	rsPeers->getOnlineList(plist);
+
+	for (std::list< RsPeerId >::const_iterator peerIt = plist.begin(); peerIt != plist.end(); peerIt++ ){
+			RsExampleItem * item = new RsExampleItem();
+			item->PeerId( (*peerIt) );
+			sendItem( item );
+	}
 }
 
 
 void p3ExampleRS::handleExampleItem( RsExampleItem * item )
 {
+	std::cout << "Example: Passed Item Example Item" << std::endl;
     std::cerr << item->PeerId() << " said: " << item->getMessage() << std::endl;
 }
 
