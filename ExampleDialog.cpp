@@ -36,15 +36,21 @@ ExampleDialog::ExampleDialog( QWidget *parent )
 }
 
 void ExampleDialog::on_timer(){
-	p3service->on_timer();
-	std::cout << "Timer: sending init messages to all contacts!!" << std::endl;
+    //p3service->on_timer();
+    std::cout << "Timer: timer!!" << std::endl;
 
-	std::list< RsPeerId > plist;
-	rsPeers->getOnlineList(plist);
+}
 
-	for (std::list< RsPeerId >::const_iterator peerIt = plist.begin(); peerIt != plist.end(); peerIt++ ){
-			RsExampleItem * item = new RsExampleItem();
-			item->PeerId( (*peerIt) );
-			p3service->sendItem( item );
-	}
+void ExampleDialog::on_pushButton_clicked()
+{
+
+    std::cout << "Button: sending init messages to all contacts!!" << std::endl;
+    std::list< RsPeerId > plist;
+    rsPeers->getOnlineList(plist);
+
+    for (std::list< RsPeerId >::const_iterator peerIt = plist.begin(); peerIt != plist.end(); peerIt++ ){
+            RsExampleItem * item = new RsExampleItem();
+            item->PeerId( (*peerIt) );
+            p3service->sendItem( item );
+    }
 }

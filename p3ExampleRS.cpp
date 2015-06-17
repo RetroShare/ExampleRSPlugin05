@@ -108,7 +108,7 @@ void p3ExampleRS::on_timer(){
 
 	std::list< RsPeerId > plist;
 
-	RsStackMutex stack(mExampleMtx); /****** LOCKED MUTEX *******/
+    //RsStackMutex stack(mExampleMtx); /****** LOCKED MUTEX *******/
 	rsPeers->getOnlineList(plist);
 
 	for (std::list< RsPeerId >::const_iterator peerIt = plist.begin(); peerIt != plist.end(); peerIt++ ){

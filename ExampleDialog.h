@@ -25,6 +25,7 @@ private:
 private slots:
 	void on_timer();
 
+    void on_pushButton_clicked();
 };
 
 #endif // ZERORESERVEDIALOG_H
